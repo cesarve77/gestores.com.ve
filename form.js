@@ -12,6 +12,7 @@ console.log('creditCardSchema', creditCardSchema)
 import {check} from 'meteor/check'
 import {MP} from './client'
 
+
 processing = new ProgressModal()
 
 const showError503 = (error)=> {

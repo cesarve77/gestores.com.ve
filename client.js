@@ -23,4 +23,6 @@ export const  MP = {
     configure: (options)=> {
         _.extend(MP.options,options)
     }
+
+    
 }
