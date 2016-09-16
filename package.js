@@ -29,7 +29,6 @@ Package.onTest(function (api) {
 
 
 Npm.depends({
-    card: '2.0.3',
     mercadopago: '0.5.0',
     fibers:'1.0.13',
     "body-parser": '1.15.2'

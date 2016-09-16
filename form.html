@@ -2,52 +2,49 @@
     {{#autoForm schema=creditCardSchema id="creditCard" type="normal"  }}
         {{> afQuickField name='email' type=emailType value=this.payer.email}}
         {{> afQuickField name='paymentMethodId' type='hidden' value='visa' }}
-        <div class="row">
-            <div class="col-lg-5 col-md-6 col-sm-7 col-lg-offset-1 ">
-                <div class="row">
-                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                        {{> afQuickField name='cardNumber' placeholder="•••• •••• •••• ••••"}}
-                    </div>
-                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                        {{> afQuickField name='cardholderName' placeholder="Pedro Perez" value=cardHolderName}}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-xs-6 col-sm-3 col-md-3 col-lg-3">
-                        <div class="form-group" style="width: 100%">
-                            <label for="exampleInputEmail1">Vencimiento</label>
-                            <div class="input-group" style="width: 100%">
-                                {{> afFieldInput name='cardExpirationMonth' firstOption=false }}
-                                <span class="input-group-btn" style="width:0px;"></span>
-                                {{> afFieldInput name='cardExpirationYear' firstOption=false  }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xs-6 col-sm-3 col-md-3 col-lg-3">
-                        {{> afQuickField name='securityCode' placeholder="•••"  }}
-                    </div>
 
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                        <div class="form-group" style="width: 100%">
-                            <label for="exampleInputEmail1">Documento</label>
-                            <div class="input-group" style="width: 100%">
-                                {{> afFieldInput name='docType' firstOption=false  options=indenificationsTypes }}
-                                <span class="input-group-btn" style="width:0px;"></span>
-                                {{> afFieldInput name='docNumber' placeholder="12345678"  style="width: 100%" }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                        <button type="submit" class="btn btn-primary btn-block btn-lg payment">
-                            <i class="fa fa-credit-card"></i> Pagar {{payment.transaction_amount}} {{currency}}
-                        </button>
-                        <br><br>
+        <div class="row">
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                {{> afQuickField name='cardNumber' placeholder="•••• •••• •••• ••••"}}
+            </div>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                {{> afQuickField name='cardholderName' placeholder="Pedro Perez" value=cardHolderName}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-3 col-md-3 col-lg-3">
+                <div class="form-group" style="width: 100%">
+                    <label for="exampleInputEmail1">Vencimiento</label>
+                    <div class="input-group" style="width: 100%">
+                        {{> afFieldInput name='cardExpirationMonth' firstOption=false }}
+                        <span class="input-group-btn" style="width:0px;"></span>
+                        {{> afFieldInput name='cardExpirationYear' firstOption=false  }}
                     </div>
                 </div>
             </div>
-            <div class="col-lg-5  col-sm-5  col-md-6 card-wrapper "></div>
+            <div class="col-xs-6 col-sm-3 col-md-3 col-lg-3">
+                {{> afQuickField name='securityCode' placeholder="•••"  }}
+            </div>
+
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                <div class="form-group" style="width: 100%">
+                    <label for="exampleInputEmail1">Documento</label>
+                    <div class="input-group" style="width: 100%">
+                        {{> afFieldInput name='docType' firstOption=false  options=indenificationsTypes }}
+                        <span class="input-group-btn" style="width:0px;"></span>
+                        {{> afFieldInput name='docNumber' placeholder="12345678"  style="width: 100%" }}
+                    </div>
+                </div>
+            </div>
         </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <button type="submit" class="btn btn-primary btn-block btn-lg payment">
+                    <i class="fa fa-credit-card"></i> Pagar {{payment.transaction_amount}} {{currency}}
+                </button>
+                <br><br>
+            </div>
+        </div>
+
     {{/autoForm}}
 </template>

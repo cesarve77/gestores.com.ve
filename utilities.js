@@ -6,7 +6,7 @@ export const beginSubmit = function (selector, target) {
     var $target = $(target)
     $selector.prop("disabled", true).find('[name], button, type').prop("disabled", true);
     $target.data('original-html', $target.html());
-    $target.html('Wait <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>')
+    $target.html('Espere <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>')
 }
 export const endSubmit = function (selector, target) {
     var $selector = $(selector)
@@ -75,7 +75,12 @@ export class ProgressModal {
     setFooter(footer) {
         this.pleaseWaitDiv.find('.modal-footer').html(footer)
     }
+    end(){
+        this.stopInc()
+        this.setVal(100)
+    }
     showPleaseWait() {
+        this.setVal(0);
         this.isShow=true
         this.pleaseWaitDiv = this.div.clone()
         this.pleaseWaitDiv.modal();
@@ -84,10 +89,10 @@ export class ProgressModal {
             this.pleaseWaitDiv.remove()
             this.pleaseWaitDiv = this.div.clone();
         })
-        this.setVal(0);
         this.interval = setInterval(()=> {
             this.incVal()
         }, 300)
     }
 }
+
 

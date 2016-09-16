@@ -24,6 +24,7 @@ Meteor.methods({
         return doPayment
             .then(
                 (result)=> {
+                    console.log('mpCheckout result',result)
                     if (MP.registerTransactions)
                         MP.transactions.insert(result)
 
@@ -40,6 +41,7 @@ Meteor.methods({
                     return payment
                 })
             .catch(err => {
+                console.log('mpCheckout err',err)
                 //capturamos el error
                 if (err.error == 402) {
                     //ejecutamos la funcion del usuario

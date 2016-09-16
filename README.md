@@ -66,7 +66,7 @@ Hay 3 tipos de funciones que puedes configurar del lado del Servidor
 **onSuccess(payment)**: se ejecutará cuando una transacción sea aprobada o pendiente (puedes poner
  binary_mode para evitar el status pendiente) y recibe como parametro el objeto payment 
  [https://www.mercadopago.com.ve/developers/es/api-docs/custom-checkout/create-payments/] 
- devuelto por mercadopago. Debes aplicar tu logía para actualizar tu base de datos
+ devuelto por mercadopago. Debes aplicar tu logía para actualizar tu base de datos.
 
 **onError(error)**: se ejecutará cuando no se haya podido aprobar la transación pero se puede 
 volver a intentar, normalmente pueden ser errores del cliente al llenar el formulario, y recibe 

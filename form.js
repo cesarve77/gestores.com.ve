@@ -8,20 +8,22 @@ import './form.html'
 import {paymentSchema} from './payment-schema'
 import {ReactiveVar} from 'meteor/reactive-var'
 import {errorMessage} from './errors'
-console.log('creditCardSchema', creditCardSchema)
 import {check} from 'meteor/check'
 import {MP} from './client'
-
+import {log} from './MP'
 
 processing = new ProgressModal()
 
 const showError503 = (error)=> {
-    processing.showPleaseWait()
+    log('showError503', error)
+    if (processing.isShow == false)
+        processing.showPleaseWait()
     processing.setTitle('ERROR:')
-    processing.setBody(error.reason)
+    processing.setBody(error.reason || error.message)
     processing.setFooter('<button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>')
 }
 const showOtherError = (error)=> {
+    log('showOtherError', error)
     setTimeout(()=> {
         const msg = errorMessage(error)
         processing.setTitle('ERROR: No pudimos procesar con éxito su tarjeta!')
@@ -32,6 +34,7 @@ const showOtherError = (error)=> {
 AutoForm.hooks({
     creditCard: {
         onSubmit: function (doc) {
+            log('onSubmit', doc)
             event.preventDefault()
             //obtengo la data que viene del la declaración del template {{>MP_form data}} como this
             const payment = this.template.view.parentView.parentView.templateInstance().data
@@ -45,22 +48,28 @@ AutoForm.hooks({
             Mercadopago.getPaymentMethod({
                 "bin": doc.cardNumber.replace(/[ .-]/g, '').slice(0, 6)
             }, (status, response)=> {
+                log('getPaymentMethod', status, response)
                 //aumento la barra de progreso
                 processing.setVal(15)
                 //si el status es 2xx  bien si no hubo un error
-                if (status < 200 || status> 208) {
-                    throw new Meteor.Error(503, 'No se pudo conectar con los servidores del banco, favor intente más tarde')
+                if (status < 200 || status > 208) {
+                    //log('error getPaymentMethod')
+                    const error = new Meteor.Error(503, 'No se pudo conectar con los servidores del banco, favor intente más tarde')
+
+                    throw error
                 } else {
                     //agrego el  paymentMethodId recibido al formulario que voya enviar
                     paymentMethodId = response[0].id
                     form.find('[name="paymentMethodId"]').val(paymentMethodId)
                 }
                 Mercadopago.createToken(form, (status, response)=> {
+                    log('createToken', status, response)
                     //aumento la barra de progreso
                     processing.setVal(30)
                     //si el status es 2xx  bien si no hubo un error
-                    if (status <200 || status> 208) {
+                    if (status < 200 || status > 208) {
                         this.done(new Meteor.Error(status, response.message, response.cause))
+
                     } else {
                         //envio todos los datos mas los datos nuevos obtenidos (token y paymentMethodId)
                         payment.token = response.id
@@ -80,41 +89,47 @@ AutoForm.hooks({
             })
         },
         onSuccess: function (formType, result) {
+            log('onSuccess', formType, result)
             //ocualto el modal de barra de progreso
             processing.hidePleaseWait()
             //ejecuto la funcion del usuario de la configuración MP.configure(successCallback:(result)=>{}) que recibe result
             MP.options.onSuccess(result)
         },
         onError: function (formType, error) {
+            const payment = this.template.view.parentView.parentView.templateInstance().data
+            log('onError', payment,formType, error)
+            processing.end()
             switch (error.error) {
                 //el error 503 o es leyendo la libreria o leyendo los tipos de
                 case 503:
-                    if (MP.options.onError(error))
-                        showError503(error)
+                    MP.options.onError(payment,error)
+                    showError503(error)
                     break
                 //402 es cuendo la tarjeta es rechazada
                 case 402:
-                    if (MP.options.onRejected(error))
-                        showOtherError(error)
+                    MP.options.onRejected(payment,error)
+                    showOtherError(error)
                     break
                 //otros errores
                 default:
-                    processing.setVal(95)
-                    if (MP.options.onError(error))
-                        showOtherError(error)
+                    MP.options.onError(payment,error)
+                    showOtherError(error)
 
             }
         },
         beginSubmit: function () {
+            log('beginSubmit')
             beginSubmit('form', '.payment')
         },
         endSubmit: function () {
+            log('log')
             Mercadopago.clearSession()
             endSubmit('form', '.payment')
         }
     }
 })
 Template.MP_form.onCreated(function () {
+    log('onCreated',this)
     check(this, paymentSchema)
     this.libraryLoaded = new ReactiveVar(false)
     const library = document.createElement('script')
@@ -122,12 +137,16 @@ Template.MP_form.onCreated(function () {
     library.src = "https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js"
     library.type = "text/javascript"
     const timeoutId = setTimeout(()=> {
+        log('onload MP library Error')
         //si a los 10 segundos no la hemos podido leer es por que hay un error de conexcion
         const error = new Meteor.Error(503, 'No nos pudimos conectar con el banco.<br><br>Seguro es un problema temporal, por favor intenta más tarde')
-        handleError503(error)
+        MP.options.onError(this.data,error)
+
+        showError503(error)
         throw error
     }, 10000)
     library.onload = ()=> {
+        log('onload MP library success')
         clearTimeout(timeoutId)
         this.libraryLoaded.set(true)
     }
@@ -146,10 +165,14 @@ Template.MP_form.onCreated(function () {
             Mercadopago.setPublishableKey(publicKey)
             //leo de los servidores de mercadopago los tipos de
             Mercadopago.getIdentificationTypes((status, identificationsTypes)=> {
+                log('getIdentificationTypes', status, identificationsTypes)
                 console.log('identificationsTypes', status, identificationsTypes)
                 if (status != 200 && status != 201) {
                     //todo
-                    throw new Meteor.Error('No se pudieron cargar los tipos de identificacion ')
+                    const error = new Meteor.Error(503, 'No nos pudimos conectar con el banco.<br><br>Seguro es un problema temporal, por favor intenta más tarde')
+                    MP.options.onError(this.data,error)
+                    showError503(error)
+                    throw error
                 }
                 this.indenificationsTypes.set(
                     _.map(identificationsTypes, (indentificatonType)=> {
@@ -184,6 +207,7 @@ Template.MP_form.helpers({
 })
 
 Template.MP_form.onRendered(function () {
+    log('onRendered')
     //bloqueo el formulario mientras no este cargada la libreria
     beginSubmit('form', '.payment')
     this.autorun(()=> {
@@ -195,37 +219,7 @@ Template.MP_form.onRendered(function () {
     //set installments to 1 if no exist, esta función limpia los datos segun el schema
     paymentSchema.clean(this.data)
     //creamos la tarjeta visual
-    const card = new Card({
-        // a selector or DOM element for the form where users will
-        // be entering their information
-        form: 'form', // *required*
-        // a selector or DOM element for the container
-        // where you want the card to appear
-        container: '.card-wrapper', // *required*
-        formSelectors: {
-            numberInput: 'input[name="cardNumber"]',
-            expiryInput: 'select[name="cardExpirationMonth"], select[name="cardExpirationYear"]', // optional — default input[name="expiry"]
-            cvcInput: 'input[name="securityCode"]',
-            nameInput: 'input[name="cardholderName"]'
-        },
 
-        width: '100%', // optional — default 350px
-        formatting: true, // optional - default true
-        // Strings for translation - optional
-        messages: {
-            validDate: 'valid\ndate', // optional - default 'valid\nthru'
-            monthYear: 'mm/yyyy' // optional - default 'month/year'
-        },
-        // Default placeholders for rendered fields - optional
-        placeholders: {
-            number: '•••• •••• •••• ••••',
-            name: 'John Doe',
-            expiry: '••/••',
-            cvc: '•••'
-        },
-        // if true, will log helpful messages for setting up Card
-        debug: false // optional - default false
-    });
 
 })
 
