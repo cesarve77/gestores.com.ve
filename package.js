@@ -2,7 +2,7 @@ Package.describe({
     name: 'cesarve:mp',
     version: '0.0.2',
     // Brief, one-line summary of the package.
-    summary: 'Simple implementación de Mercado Pago',
+    summary: 'Simple implementación de Mercado Pago, (mp mercadpado)',
     // URL to the Git repository containing the source code for this package.
     git: 'https://github.com/cesarve77/simple-mercado-pago',
     // By default, Meteor will default to using README.md for documentation.
@@ -20,12 +20,6 @@ Package.onUse(function (api) {
 })
 ;
 
-Package.onTest(function (api) {
-    api.use('ecmascript');
-    api.use('tinytest');
-    api.use('cesarve:mp');
-    api.mainModule('mp-tests.js');
-});
 
 
 Npm.depends({
