@@ -3,7 +3,7 @@
 Facíl uso he instalación del custom checkout de mercado pago para Meteor
 
 ![example]
-(http://cesarramos.me/mp.png)
+(http://cesarramos.me/public/mp.png)
 
 ## Instalación
 ```
