@@ -2,6 +2,8 @@
 
 Facíl uso he instalación del custom checkout de mercado pago para Meteor
 
+(http://cesarramos.me/mp.png)
+
 ## Instalación
 ```
 $ meteor add cesarve:mp
