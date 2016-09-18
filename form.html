@@ -27,13 +27,16 @@
             </div>
 
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                <div class="form-group" style="width: 100%">
+                <div class="form-group{{#if afFieldIsInvalid name='docNumber'}} has-error{{/if}}" style="width: 100%">
                     <label for="exampleInputEmail1">Documento</label>
                     <div class="input-group" style="width: 100%">
                         {{> afFieldInput name='docType' firstOption=false  options=indenificationsTypes }}
                         <span class="input-group-btn" style="width:0px;"></span>
                         {{> afFieldInput name='docNumber' placeholder="12345678"  style="width: 100%" }}
                     </div>
+                    {{#if afFieldIsInvalid name='docNumber'}}
+                        <span class="help-block">{{afFieldMessage name='docNumber'}}</span>
+                    {{/if}}
                 </div>
             </div>
         </div>

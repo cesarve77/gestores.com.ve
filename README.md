@@ -14,7 +14,7 @@ $ meteor add cesarve:mp
 
 Donde data es un objeto con la infomación del pago ver [https://www.mercadopago.com.ve/developers/es/api-docs/custom-checkout/create-payments/]
 Aquí puedes pasar información relevante a la compra que el cliente esta haceindo, para recuperarla
- luego de cuando finalice la transacción y actualiazr tu base de datos.
+ luego de cuando finalice la transacción y actualizar tu base de datos.
  
 Por ejemplo puedes usar los campos
 * external_reference: ID given by the merchant in their system
